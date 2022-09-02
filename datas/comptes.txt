@@ -1,0 +1,5 @@
+10273832&&Epargne&&13/06/2022&&4000.0&&HTG&&actif&&1&&Cyb Hartropp
+10273833&&Epargne&&13/06/2022&&3463.0&&USD&&ferme&&5&&Wilie Kadar
+10273834&&Courant&&13/06/2022&&5886.0&&HTG&&ferme&&4&&Grady McCarle
+10273835&&Epargne&&16/06/2022&&49031.0&&HTG&&actif&&21&&Point Du jour Jerry
+

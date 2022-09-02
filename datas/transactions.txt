@@ -1,0 +1,20 @@
+151&&5&&Wilie Kadar&&10273833&&16/06/2022&&200.0&&USD&&depot
+152&&5&&Wilie Kadar&&10273833&&16/06/2022&&120.0&&USD&&depot
+153&&5&&Wilie Kadar&&10273833&&16/06/2022&&300.0&&USD&&depot
+154&&1&&Cyb Hartropp&&10273832&&16/06/2022&&200.0&&HTG&&retrait
+155&&1&&Cyb Hartropp&&10273832&&16/06/2022&&900.0&&HTG&&retrait
+156&&1&&Cyb Hartropp&&10273832&&16/06/2022&&190.0&&HTG&&retrait
+157&&1&&Cyb Hartropp&&10273832&&16/06/2022&&2000.0&&HTG&&depot
+158&&4&&Grady McCarle&&10273834&&16/06/2022&&3000.0&&HTG&&depot
+159&&21&&Point Du jour Jerry&&10273835&&16/06/2022&&200.0&&HTG&&retrait
+160&&21&&Point Du jour Jerry&&10273835&&16/06/2022&&233.0&&HTG&&depot
+161&&21&&Point Du jour Jerry&&10273835&&16/06/2022&&12.0&&HTG&&depot
+162&&21&&Point Du jour Jerry&&10273835&&16/06/2022&&45.0&&HTG&&retrait
+163&&21&&Point Du jour Jerry&&10273835&&16/06/2022&&20.0&&HTG&&retrait
+164&&21&&Point Du jour Jerry&&10273835&&16/06/2022&&34.0&&HTG&&retrait
+165&&21&&Point Du jour Jerry&&10273835&&16/06/2022&&34.0&&HTG&&retrait
+166&&21&&Point Du jour Jerry&&10273835&&16/06/2022&&21.0&&HTG&&depot
+167&&21&&Point Du jour Jerry&&10273835&&16/06/2022&&899.0&&HTG&&retrait
+168&&21&&Point Du jour Jerry&&10273835&&16/06/2022&&3.0&&HTG&&retrait
+169&&1&&Cyb Hartropp&&10273832&&17/06/2022&&300.0&&HTG&&depot
+170&&1&&Cyb Hartropp&&10273832&&17/06/2022&&10.0&&HTG&&retrait
