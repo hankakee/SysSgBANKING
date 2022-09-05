@@ -6,10 +6,15 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Scanner;
+
+import database.Jdbcmanager;
 
 public class Clients {
 	// Leid du client, le nom complet du client, la date de creation,
@@ -113,58 +118,101 @@ public class Clients {
 
 
 	public void readAllClients() {
-		try {
-			File file = new File("datas/clients.txt");
-			FileReader fr = new FileReader(file);
-			BufferedReader br = new BufferedReader(fr);
-			StringBuffer sb = new StringBuffer();
-
-			String line;
-			while ((line = br.readLine()) != null) {
-				String client = "    " + line.split("&&")[0] + "  "
-						+ line.split("&&")[1] + "   " + line.split("&&")[2]
-						+ "   " + line.split("&&")[3] + "     "
-						+ line.split("&&")[4] + "      " + line.split("&&")[5]
-						+ "    " + line.split("&&")[6] + "    "
-						+ line.split("&&")[7] + "  ";
-				sb.append(client);
-				sb.append("\n\n");
+		 ResultSet rstab = null;
+	        Statement st=null;
+	        StringBuffer sb = new StringBuffer();
+			try{
+				st = Jdbcmanager.ConnexionDb().createStatement();
+				rstab= st.executeQuery("select * from CLIENTS");
+				while(rstab.next()){
+						String client = "    " + rstab.getInt("ID") + "  "
+								+ rstab.getString("Client") + "   " + rstab.getString("creele")
+								+ "   " + rstab.getString("adresse") + "     "
+								+ rstab.getString("telephone")+ "      "
+								+ rstab.getInt("succursale")+ "    "
+								+ rstab.getString("statusMatrimonial") + "    "
+								+ rstab.getInt("enfants") + "  ";
+						sb.append(client);
+						sb.append("\n\n");
+				}
+				System.out
+				.println("+------+---------+----------+-----------+------------+-------------+-------------------+----------+");
+				System.out
+						.println("| ID   | Client  |  Cree le |  Adresse  | Telephone  |  Succursale | StatusMatrimonial | Enfants |");
+				System.out
+						.println("+------+---------+----------+-----------+------------+-------------+-------------------+----------+");
+				System.out.println(sb.toString());
+				System.out
+				.println("+------+---------+----------+-----------+------------+-------------+-------------------+----------+");
+		
+				rstab.close();
+				st.close();
+			}catch(SQLException e){
+				e.printStackTrace();
 			}
-			fr.close();
-			System.out
-					.println("+------+---------+----------+-----------+------------+-------------+-------------------+----------+");
-			System.out
-					.println("| ID   | Client  |  Cree le |  Adresse  | Telephone  |  Succursale | StatusMatrimonial | Enfants |");
-			System.out
-					.println("+------+---------+----------+-----------+------------+-------------+-------------------+----------+");
-			System.out.println(sb.toString());
-			System.out
-					.println("+------+---------+----------+-----------+------------+-------------+-------------------+----------+");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 	
 	
 	
 	public String searchClientByID(int id) {
-		try {
-			File file = new File("datas/clients.txt");
-			FileReader fr = new FileReader(file);
-			BufferedReader br = new BufferedReader(fr);
-			StringBuffer sb = new StringBuffer();
-
-			String line;
-			boolean found = false;
-			while ((line = br.readLine()) != null) {
-				if (Integer.parseInt(line.split("&&")[0]) == id) {
-					String client = "    " + line.split("&&")[0] + "  "
-							+ line.split("&&")[1] + "   " + line.split("&&")[2]
-							+ "   " + line.split("&&")[3] + "     "
-							+ line.split("&&")[4] + "      "
-							+ line.split("&&")[5] + "    "
-							+ line.split("&&")[6] + "    "
-							+ line.split("&&")[7] + "  ";
+//		try {
+//			File file = new File("datas/clients.txt");
+//			FileReader fr = new FileReader(file);
+//			BufferedReader br = new BufferedReader(fr);
+//			StringBuffer sb = new StringBuffer();
+//
+//			String line;
+//			boolean found = false;
+//			while ((line = br.readLine()) != null) {
+//				if (Integer.parseInt(line.split("&&")[0]) == id) {
+//					String client = "    " + line.split("&&")[0] + "  "
+//							+ line.split("&&")[1] + "   " + line.split("&&")[2]
+//							+ "   " + line.split("&&")[3] + "     "
+//							+ line.split("&&")[4] + "      "
+//							+ line.split("&&")[5] + "    "
+//							+ line.split("&&")[6] + "    "
+//							+ line.split("&&")[7] + "  ";
+//					sb.append(client);
+//					System.out
+//							.println("+------+---------+----------+-----------+------------+-------------+-------------------+----------+");
+//					System.out
+//							.println("| ID   | Client  |  Cree le |  Adresse  | Telephone  |  Succursale | StatusMatrimonial | Enfants |");
+//					System.out
+//							.println("+------+---------+----------+-----------+------------+-------------+-------------------+----------+");
+//					System.out.println(sb.toString());
+//					System.out
+//							.println("+------+---------+----------+-----------+------------+-------------+-------------------+----------+");
+//					sb.append("\n\n");
+//					found = true;
+//					br.close();
+//					return line.toString();
+//				}
+//			}
+//
+//			if (!found) {
+//				System.out.println("Aucun client ayant l'id " + id);
+//				
+//			}
+//			fr.close();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+        ResultSet rstab = null;
+        Statement st=null;
+        StringBuffer sb = new StringBuffer();
+//        String line;
+		boolean found = false;
+		try{
+			st = Jdbcmanager.ConnexionDb().createStatement();
+			rstab= st.executeQuery("select * from CLIENTS where id="+id);
+			while(rstab.next()){
+					String client = "    " + rstab.getInt("ID") + "  "
+							+ rstab.getString("Client") + "   " + rstab.getString("creele")
+							+ "   " + rstab.getString("adresse") + "     "
+							+ rstab.getString("telephone")+ "      "
+							+ rstab.getInt("succursale")+ "    "
+							+ rstab.getString("statusMatrimonial") + "    "
+							+ rstab.getInt("enfants") + "  ";
 					sb.append(client);
 					System.out
 							.println("+------+---------+----------+-----------+------------+-------------+-------------------+----------+");
@@ -177,24 +225,21 @@ public class Clients {
 							.println("+------+---------+----------+-----------+------------+-------------+-------------------+----------+");
 					sb.append("\n\n");
 					found = true;
-					br.close();
-					return line.toString();
-				}
+					String clname=rstab.getString("Client");
+//					return line.toString();
+					st.close();
+					rstab.close();
+//					return client;
+					return clname;
 			}
-
-			if (!found) {
-				System.out.println("Aucun client ayant l'id " + id);
-				
-			}
-			fr.close();
-		} catch (IOException e) {
-			e.printStackTrace();
+		}catch(SQLException e){
+			System.out.println("Aucun client ayant l'id " + id);
 		}
 		return "no client";
 	}
 
 	
-	
+//	pas besoin 
 	public int findLastIdClient() {
 		int lastid = 0;
 		int max=0;
@@ -305,41 +350,54 @@ public class Clients {
 			
 			//----------Lire et reecriture dans un tableau en remplacant la ligne concernee----------------
 			//			lire
-			FileReader fr;
-			try {
-				File file = new File("datas/clients.txt");
-				fr = new FileReader(file);
-				BufferedReader br = new BufferedReader(fr);
-				String line;
-				while ((line = br.readLine()) != null) {
-					if (Integer.parseInt(line.split("&&")[0]) != choosedID) {
-						String client = line.split("&&")[0] + "&&"+ line.split("&&")[1] + "&&" + line.split("&&")[2] + "&&"+ line.split("&&")[3] + "&&" + line.split("&&")[4]+ "&&" + line.split("&&")[5] + "&&"+ line.split("&&")[6] + "&&" + line.split("&&")[7];
-						 arClients.add(client);
-					}else if(Integer.parseInt(line.split("&&")[0]) == choosedID){
-						String clientmodif = line.split("&&")[0] + "&&"+ line.split("&&")[1] + "&&" + line.split("&&")[2] + "&&"+ thisclient.getAdresse() + "&&" + thisclient.getTel()+ "&&" + line.split("&&")[5] + "&&"+ line.split("&&")[6] + "&&" + line.split("&&")[7];
-						 arClients.add(clientmodif);
+//			FileReader fr;
+//			try {
+//				File file = new File("datas/clients.txt");
+//				fr = new FileReader(file);
+//				BufferedReader br = new BufferedReader(fr);
+//				String line;
+//				while ((line = br.readLine()) != null) {
+//					if (Integer.parseInt(line.split("&&")[0]) != choosedID) {
+//						String client = line.split("&&")[0] + "&&"+ line.split("&&")[1] + "&&" + line.split("&&")[2] + "&&"+ line.split("&&")[3] + "&&" + line.split("&&")[4]+ "&&" + line.split("&&")[5] + "&&"+ line.split("&&")[6] + "&&" + line.split("&&")[7];
+//						 arClients.add(client);
+//					}else if(Integer.parseInt(line.split("&&")[0]) == choosedID){
+//						String clientmodif = line.split("&&")[0] + "&&"+ line.split("&&")[1] + "&&" + line.split("&&")[2] + "&&"+ thisclient.getAdresse() + "&&" + thisclient.getTel()+ "&&" + line.split("&&")[5] + "&&"+ line.split("&&")[6] + "&&" + line.split("&&")[7];
+//						 arClients.add(clientmodif);
+//					}
+//				}
+//				br.close();
+//				scanint2.close();
+//				scanString2.close();
+//				
+//				//effacer les anciennes donnees 
+//				FileWriter fw3= new FileWriter(file);
+//				BufferedWriter bw3=new BufferedWriter(fw3);
+//				bw3.write("");bw3.close();fw3.close();
+////				--------reecriture dans le vrai fichier....
+//				BufferedWriter bw4=new BufferedWriter(new FileWriter(file,true));
+//					for(String client : arClients){
+//						bw4.append(client);
+//						bw4.newLine();
+//					}
+//					bw4.close();
+//					System.out.println("L'adresse et le numero de telephone du client a ete modifie avec success...");
+//			} catch (NumberFormatException | IOException  e) {
+//				e.printStackTrace();
+//				System.out.println("Client non modifie..."+e.getMessage());
+//			}
+					Statement st=null;
+					try{
+						st = Jdbcmanager.ConnexionDb().createStatement();
+						String req = String.join(" ","update CLIENTS set adresse='",thisclient.getAdresse().trim(),"',telephone='",thisclient.getTel()+"'",
+								" where id=",choosedID+";");
+//						System.out.println(req);
+						st.executeUpdate(req);
+						System.out.println("L'adresse et le numero de telephone du client a ete modifie avec success...");
+
+							searchClientByID(choosedID);
+					}catch(SQLException e){
+						System.out.println("Client non modifie..."+e.getMessage());
 					}
-				}
-				br.close();
-				scanint2.close();
-				scanString2.close();
-				
-				//effacer les anciennes donnees 
-				FileWriter fw3= new FileWriter(file);
-				BufferedWriter bw3=new BufferedWriter(fw3);
-				bw3.write("");bw3.close();fw3.close();
-//				--------reecriture dans le vrai fichier....
-				BufferedWriter bw4=new BufferedWriter(new FileWriter(file,true));
-					for(String client : arClients){
-						bw4.append(client);
-						bw4.newLine();
-					}
-					bw4.close();
-					System.out.println("L'adresse et le numero de telephone du client a ete modifie avec success...");
-			} catch (NumberFormatException | IOException  e) {
-				e.printStackTrace();
-				System.out.println("Client non modifie..."+e.getMessage());
-			}
 		}else{
 			System.err.println("Aucun client trouve pour cet id de compte...");
 		}
@@ -436,25 +494,41 @@ public class Clients {
 		scanint.close();
 		scanString.close();
 		
-		
-		
-		
+			
 		
 		Date date = new Date();
-		SimpleDateFormat DateFor = new SimpleDateFormat("dd/MM/yyyy");
+//		li te dd/MM/yyyy
+		SimpleDateFormat DateFor = new SimpleDateFormat("yyyy-MM-dd");
 	    thisclient.setDateCreation(DateFor.format(date));
 		BufferedWriter bw;
-		int new_id_client=findLastIdClient()+1;
-		try {
-			String client = new_id_client + "&&"+ thisclient.getFullname() + "&&" + thisclient.getDateCreation() + "&&"+ thisclient.getAdresse() + "&&" + thisclient.getTel()+ "&&" + thisclient.getSuccursale() + "&&"+ thisclient.getStatuMatrimonial() + "&&" + thisclient.getNbEnfants();
-			File file = new File("datas/clients.txt");
-			bw = new BufferedWriter(new FileWriter(file, true));
-			bw.append(client);
-			bw.newLine();
-			bw.close();
+//		int new_id_client=findLastIdClient()+1;
+//		try {
+//			String client = new_id_client + "&&"+ thisclient.getFullname() + "&&" + thisclient.getDateCreation() + "&&"+
+//		thisclient.getAdresse() + "&&" + thisclient.getTel()+ "&&" + thisclient.getSuccursale() + "&&"+ thisclient.getStatuMatrimonial() + "&&" + thisclient.getNbEnfants();
+//			File file = new File("datas/clients.txt");
+//			bw = new BufferedWriter(new FileWriter(file, true));
+//			bw.append(client);
+//			bw.newLine();
+//			bw.close();
+//			System.out.println("Client ajoute avec succes!");
+//			searchClientByID(new_id_client);
+//		} catch (IOException e) {
+//			System.out.println("Erreur le client n'a pas ete ajoute...");
+//			e.printStackTrace();
+//		}
+		Statement st=null;
+		try{
+			st = Jdbcmanager.ConnexionDb().createStatement();
+			String req = String.join(" ","insert into CLIENTS(Client,creele,adresse,telephone,succursale,statusMatrimonial,enfants) VALUES(",
+			"'"+thisclient.getFullname()+"',","'"+thisclient.getDateCreation()+"',","'"+thisclient.getAdresse()+"',","'"+thisclient.getTel()+"',",""+thisclient.getSuccursale()+",","'"+thisclient.getStatuMatrimonial()+"',",thisclient.getNbEnfants()+");");
+			System.out.println(req);
+			st.executeUpdate(req);
 			System.out.println("Client ajoute avec succes!");
-			searchClientByID(new_id_client);
-		} catch (IOException e) {
+			ResultSet res=st.executeQuery("SELECT LAST_INSERT_ID() as idlast");
+			if(res.next()) {
+				searchClientByID(res.getInt("idlast"));
+			}
+		}catch(SQLException e){
 			System.out.println("Erreur le client n'a pas ete ajoute...");
 			e.printStackTrace();
 		}

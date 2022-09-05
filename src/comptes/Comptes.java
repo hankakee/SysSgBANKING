@@ -6,12 +6,16 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Scanner;
 
 import clients.Clients;
+import database.Jdbcmanager;
 
 public class Comptes {
 
@@ -97,21 +101,18 @@ public class Comptes {
 	
 	
 	public int findLastAccountNumber() {
-		int lastaccountNumber = 0;
 		int max=0;
 		try {
-			File file = new File("datas/comptes.txt");
-			FileReader fr = new FileReader(file);
-			BufferedReader br = new BufferedReader(fr);
-			String line;
-			while ((line = br.readLine()) != null) {
-				lastaccountNumber = Integer.parseInt(line.split("&&")[0]);
-				if(lastaccountNumber>max){
-					max=lastaccountNumber;
-				}
+			Statement st=null;
+			st = Jdbcmanager.ConnexionDb().createStatement();
+			ResultSet res=st.executeQuery("SELECT MAX(noCompte) as maxno from comptes");
+			if(res.next()) {
+				max=res.getInt("maxno");
 			}
-			fr.close();
-		} catch (IOException e) {
+			System.out.println("le max bro: "+max);
+			res.close();
+			st.close();
+		} catch (SQLException e) {
 			System.out.println("Denier compte inconnu..."+e.getMessage());
 //			e.printStackTrace();
 		}
@@ -120,26 +121,39 @@ public class Comptes {
 	
 	
 	public void readAllComptes() {
+		  ResultSet rstab = null;
+	        Statement st=null;
 		try {
-			File file = new File("datas/comptes.txt");
-			FileReader fr = new FileReader(file);
-			BufferedReader br = new BufferedReader(fr);
+//			File file = new File("datas/comptes.txt");
+//			FileReader fr = new FileReader(file);
+//			BufferedReader br = new BufferedReader(fr);
 			StringBuffer sb = new StringBuffer();
-
-			String line;
-			while ((line = br.readLine()) != null) {
-				if(!line.split("&&")[5].equalsIgnoreCase("ferme")){
-				String client = "    " + line.split("&&")[0] + "  "
-						+ line.split("&&")[1] + "   " + line.split("&&")[2]
-						+ "   " + line.split("&&")[3] + "     "
-						+ line.split("&&")[4] + "      " + line.split("&&")[5]
-						+ "       (" + line.split("&&")[6]+" "+line.split("&&")[7]+")";
+//
+//			String line;
+//			while ((line = br.readLine()) != null) {
+//				if(!line.split("&&")[5].equalsIgnoreCase("ferme")){
+//				String client = "    " + line.split("&&")[0] + "  "
+//						+ line.split("&&")[1] + "   " + line.split("&&")[2]
+//						+ "   " + line.split("&&")[3] + "     "
+//						+ line.split("&&")[4] + "      " + line.split("&&")[5]
+//						+ "       (" + line.split("&&")[6]+" "+line.split("&&")[7]+")";
+//				sb.append(client);
+//				sb.append("\n\n");
+//				}
+//			}
+//			fr.close();
+//			1097273832&&Courant&&13/06/2022&&800.0&&actif&&14
+			st = Jdbcmanager.ConnexionDb().createStatement();
+			rstab= st.executeQuery("select * from comptes inner join clients on clients.id=comptes.id;");
+			while(rstab.next()){
+				String client = "    " + rstab.getInt("noCompte") + "  "
+						+ rstab.getString("type") + "   " + rstab.getString("creele")
+						+ "   " + rstab.getFloat("solde") + "     "
+						+ rstab.getString("monnaie") + "      " + rstab.getString("etat")
+						+ "       (" + rstab.getInt("idclient")+" "+rstab.getString("Client")+")";
 				sb.append(client);
 				sb.append("\n\n");
-				}
 			}
-			fr.close();
-//			1097273832&&Courant&&13/06/2022&&800.0&&actif&&14
 			System.out
 					.println("+------+---------+----------+-----------+------------+-------------+-------------------+");
 			System.out
@@ -149,45 +163,45 @@ public class Comptes {
 			System.out.println(sb.toString());
 			System.out
 					.println("+------+---------+----------+-----------+------------+-------------+-------------------+");
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
+			System.out.println(e.getMessage());
 		}
 	}
 	
 	
 	public String readComptesByNoCompte(long numCompte,boolean show) {
 		try {
-			File file = new File("datas/comptes.txt");
-			FileReader fr = new FileReader(file);
-			BufferedReader br = new BufferedReader(fr);
+//			File file = new File("datas/comptes.txt");
+//			FileReader fr = new FileReader(file);
+//			BufferedReader br = new BufferedReader(fr);
 			StringBuffer sb = new StringBuffer();
 
 			String line;
 			boolean found = false;
-			while ((line = br.readLine()) != null) {
-				if (Long.parseLong(line.split("&&")[0]) == numCompte) {
-				String client = "    " + line.split("&&")[0] + "  "
-						+ line.split("&&")[1] + "   " + line.split("&&")[2]
-						+ "   " + line.split("&&")[3] + "     "
-						+ line.split("&&")[4] + "      " + line.split("&&")[5]
-						+ "    (" + line.split("&&")[6]+" "+line.split("&&")[7]+")";
+			Statement st=null;
+			ResultSet rstab=null;
+			st = Jdbcmanager.ConnexionDb().createStatement();
+			rstab= st.executeQuery("select * from comptes inner join clients on clients.id=comptes.id and comptes.noCompte="+numCompte+";");
+			while(rstab.next()){
+				String client = "    " + rstab.getInt("noCompte") + "  "
+						+ rstab.getString("type") + "   " + rstab.getString("creele")
+						+ "   " + rstab.getFloat("solde") + "     "
+						+ rstab.getString("monnaie") + "      " + rstab.getString("etat")
+						+ "       (" + rstab.getInt("idclient")+" "+rstab.getString("Client")+")";
 				sb.append(client);
 				sb.append("\n\n");
-				if(show){
-					System.out
-						.println("+------+---------+----------+-----------+------------+-------------+-------------------+");
+				found=true;
+			}
+			if(show){
 				System.out
-						.println("| NoCompte   | Type  |  Cree le |  Solde  | Monnaie  |  Etat | Client  |");
-				System.out
-						.println("+------+---------+----------+-----------+------------+-------------+-------------------+");
-				System.out.println(sb.toString());
-				System.out.println("+------+---------+----------+-----------+------------+-------------+-------------------+");
-				}
-				
-			     found=true;
-			     br.close();
-				return line.toString();
-				}
+					.println("+------+---------+----------+-----------+------------+-------------+-------------------+");
+			System.out
+					.println("| NoCompte   | Type  |  Cree le |  Solde  | Monnaie  |  Etat | Client  |");
+			System.out
+					.println("+------+---------+----------+-----------+------------+-------------+-------------------+");
+			System.out.println(sb.toString());
+			System.out.println("+------+---------+----------+-----------+------------+-------------+-------------------+");
 			}
 			if (!found) {
 				if(show){
@@ -195,9 +209,8 @@ public class Comptes {
 				}
 				
 			}
-			fr.close();
-			br.close();
-		} catch (IOException e) {
+			return sb.toString();
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return "no account";
@@ -229,45 +242,51 @@ public class Comptes {
 	public String setEtatCompte(int numCompte,String tmpStatusCompte) {
 		ArrayList<String> arComptes=new ArrayList<String>();
 		try {
-			File file = new File("datas/comptes.txt");
-			FileReader fr = new FileReader(file);
-			BufferedReader br = new BufferedReader(fr);
+//			File file = new File("datas/comptes.txt");
+//			FileReader fr = new FileReader(file);
+//			BufferedReader br = new BufferedReader(fr);
 
 			String line;
 			boolean found = false;
-			while ((line = br.readLine()) != null) {
-				if (Integer.parseInt(line.split("&&")[0]) == numCompte) {
-//					10273834&&Courant&&13/06/2022&&3000.0&&HTG&&actif&&4&&Grady McCarle
-					String compte = line.split("&&")[0] + "&&"+ line.split("&&")[1] + "&&" + line.split("&&")[2] + "&&"+ line.split("&&")[3] + "&&" + line.split("&&")[4]+ "&&" + tmpStatusCompte + "&&"+ line.split("&&")[6] + "&&" + line.split("&&")[7];
-					 arComptes.add(compte);
-					 found=true;
-				}else{
-					String comptenormal = line.split("&&")[0] + "&&"+ line.split("&&")[1] + "&&" + line.split("&&")[2] + "&&"+ line.split("&&")[3] + "&&" + line.split("&&")[4]+ "&&" + line.split("&&")[5] + "&&"+ line.split("&&")[6] + "&&" + line.split("&&")[7];
-					 arComptes.add(comptenormal);
-				}
-				
-			}
-			br.close();
-			fr.close();
+//			while ((line = br.readLine()) != null) {
+//				if (Integer.parseInt(line.split("&&")[0]) == numCompte) {
+////					10273834&&Courant&&13/06/2022&&3000.0&&HTG&&actif&&4&&Grady McCarle
+//					String compte = line.split("&&")[0] + "&&"+ line.split("&&")[1] + "&&" + line.split("&&")[2] + "&&"+ line.split("&&")[3] + "&&" + line.split("&&")[4]+ "&&" + tmpStatusCompte + "&&"+ line.split("&&")[6] + "&&" + line.split("&&")[7];
+//					 arComptes.add(compte);
+//					 found=true;
+//				}else{
+//					String comptenormal = line.split("&&")[0] + "&&"+ line.split("&&")[1] + "&&" + line.split("&&")[2] + "&&"+ line.split("&&")[3] + "&&" + line.split("&&")[4]+ "&&" + line.split("&&")[5] + "&&"+ line.split("&&")[6] + "&&" + line.split("&&")[7];
+//					 arComptes.add(comptenormal);
+//				}
+//				
+//			}
+//			br.close();
+//			fr.close();
 			
-			if(!found){
-				System.out.println("Ce compte n'existe pas!!!");
-				return "no account";
-			}
-			//effacer les anciennes donnees 
-			FileWriter fw3= new FileWriter(file);
-			BufferedWriter bw3=new BufferedWriter(fw3);
-			bw3.write("");bw3.close();fw3.close();
-//			--------reecriture dans le vrai fichier....
-			BufferedWriter bw4=new BufferedWriter(new FileWriter(file,true));
-				for(String compte : arComptes){
-					bw4.append(compte);
-					bw4.newLine();
-				}
-				bw4.close();
-				System.out.printf("\nCe compte client est passe à l'etat %s...\n",tmpStatusCompte);
-	
-		} catch (IOException e) {
+//			if(!found){
+//				System.out.println("Ce compte n'existe pas!!!");
+//				return "no account";
+//			}
+//			//effacer les anciennes donnees 
+//			FileWriter fw3= new FileWriter(file);
+//			BufferedWriter bw3=new BufferedWriter(fw3);
+//			bw3.write("");bw3.close();fw3.close();
+////			--------reecriture dans le vrai fichier....
+//			BufferedWriter bw4=new BufferedWriter(new FileWriter(file,true));
+//				for(String compte : arComptes){
+//					bw4.append(compte);
+//					bw4.newLine();
+//				}
+//				bw4.close();
+				
+			Statement st=null;
+			st = Jdbcmanager.ConnexionDb().createStatement();
+			String req = String.join(" ","update COMPTES set etat='",tmpStatusCompte+"'",
+					" where noCompte=",numCompte+";");
+//			System.out.println(req);
+			st.executeUpdate(req);
+			System.out.printf("\nCe compte client est passe à l'etat %s...\n",tmpStatusCompte);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return "modified";
@@ -280,46 +299,52 @@ public class Comptes {
 	public String setArgent(long numCompte,double montant) {
 		ArrayList<String> arComptes=new ArrayList<String>();
 		try {
-			File file = new File("datas/comptes.txt");
-			FileReader fr = new FileReader(file);
-			BufferedReader br = new BufferedReader(fr);
+//			File file = new File("datas/comptes.txt");
+//			FileReader fr = new FileReader(file);
+//			BufferedReader br = new BufferedReader(fr);
 
 			String line;
 			boolean found = false;
 			System.out.println("montant enter:"+ montant);
-			while ((line = br.readLine()) != null) {
-				if (Long.parseLong(line.split("&&")[0]) == numCompte) {
-//					10273834&&Courant&&13/06/2022&&3000.0&&HTG&&actif&&4&&Grady McCarle
-					String compte = line.split("&&")[0] + "&&"+ line.split("&&")[1] + "&&" + line.split("&&")[2] + "&&"+ montant + "&&" + line.split("&&")[4]+ "&&" + line.split("&&")[5] + "&&"+ line.split("&&")[6] + "&&" + line.split("&&")[7];
-					 arComptes.add(compte);
-					 found=true;
-				}else{
-					String comptenormal = line.split("&&")[0] + "&&"+ line.split("&&")[1] + "&&" + line.split("&&")[2] + "&&"+ line.split("&&")[3] + "&&" + line.split("&&")[4]+ "&&" + line.split("&&")[5] + "&&"+ line.split("&&")[6] + "&&" + line.split("&&")[7];
-					 arComptes.add(comptenormal);
-				}
-				
-			}
-			br.close();
-			fr.close();
+//			while ((line = br.readLine()) != null) {
+//				if (Long.parseLong(line.split("&&")[0]) == numCompte) {
+////					10273834&&Courant&&13/06/2022&&3000.0&&HTG&&actif&&4&&Grady McCarle
+//					String compte = line.split("&&")[0] + "&&"+ line.split("&&")[1] + "&&" + line.split("&&")[2] + "&&"+ montant + "&&" + line.split("&&")[4]+ "&&" + line.split("&&")[5] + "&&"+ line.split("&&")[6] + "&&" + line.split("&&")[7];
+//					 arComptes.add(compte);
+//					 found=true;
+//				}else{
+//					String comptenormal = line.split("&&")[0] + "&&"+ line.split("&&")[1] + "&&" + line.split("&&")[2] + "&&"+ line.split("&&")[3] + "&&" + line.split("&&")[4]+ "&&" + line.split("&&")[5] + "&&"+ line.split("&&")[6] + "&&" + line.split("&&")[7];
+//					 arComptes.add(comptenormal);
+//				}
+//				
+//			}
+//			br.close();
+//			fr.close();
 			
-			if(!found){
-				System.out.println("Ce compte n'existe pas!!!");
-				return "no account";
-			}
+//			if(!found){
+//				System.out.println("Ce compte n'existe pas!!!");
+//				return "no account";
+//			}
 			//effacer les anciennes donnees 
-			FileWriter fw3= new FileWriter(file);
-			BufferedWriter bw3=new BufferedWriter(fw3);
-			bw3.write("");bw3.close();fw3.close();
-//			--------reecriture dans le vrai fichier....
-			BufferedWriter bw4=new BufferedWriter(new FileWriter(file,true));
-				for(String compte : arComptes){
-					bw4.append(compte);
-					bw4.newLine();
-				}
-				bw4.close();
+//			FileWriter fw3= new FileWriter(file);
+//			BufferedWriter bw3=new BufferedWriter(fw3);
+//			bw3.write("");bw3.close();fw3.close();
+////			--------reecriture dans le vrai fichier....
+//			BufferedWriter bw4=new BufferedWriter(new FileWriter(file,true));
+//				for(String compte : arComptes){
+//					bw4.append(compte);
+//					bw4.newLine();
+//				}
+//				bw4.close();
+				Statement st=null;
+				st = Jdbcmanager.ConnexionDb().createStatement();
+				String req = String.join(" ","update COMPTES set solde='",montant+"",
+						" where noCompte=",numCompte+";");
+				System.out.println(req);
+				st.executeUpdate(req);
 				System.out.printf("\nMontant du compte modifie avec succes...\n");
-	
-		} catch (IOException e) {
+				
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return "modified";
@@ -356,7 +381,7 @@ public class Comptes {
 			
 //			date creation compte 
 			Date date = new Date();
-			SimpleDateFormat DateFor = new SimpleDateFormat("dd/MM/yyyy");
+			SimpleDateFormat DateFor = new SimpleDateFormat("yyyy-MM-dd");
 			String stringDate= DateFor.format(date);
 			thisaccount.setDateCreated(stringDate);
 			
@@ -438,20 +463,32 @@ public class Comptes {
 			//statut
 			thisaccount.setStatut("actif");
 			
-			File file = new File("datas/comptes.txt");
-			FileWriter fw3;
-			try {
-				fw3 = new FileWriter(file,true);
-				BufferedWriter bw=new BufferedWriter(fw3);
-			    String account = thisaccount.getNumCompte() + "&&"+ thisaccount.getTypecompte() + "&&" + thisaccount.getDateCreated() + "&&"+ thisaccount.getSolde() + "&&" + thisaccount.getDevise()+ "&&" + thisaccount.getStatut() + "&&" + thisaccount.getIdclient()+"&&"+lineClient.split("&&")[1];
-				bw.append(account);
-				bw.newLine();bw.close();fw3.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
+//			File file = new File("datas/comptes.txt");
+//			FileWriter fw3;
+//			try {
+//				fw3 = new FileWriter(file,true);
+//				BufferedWriter bw=new BufferedWriter(fw3);
+//			    String account = thisaccount.getNumCompte() + "&&"+ thisaccount.getTypecompte() + "&&" + thisaccount.getDateCreated() + "&&"+ thisaccount.getSolde() + "&&" + thisaccount.getDevise()+ "&&" + thisaccount.getStatut() + "&&" + thisaccount.getIdclient()+"&&"+lineClient.split("&&")[1];
+//				bw.append(account);
+//				bw.newLine();bw.close();fw3.close();
+//			} catch (IOException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+			Statement st=null;
+			try{
+				st = Jdbcmanager.ConnexionDb().createStatement();
+//				ID	NoCompte	type creele	solde	monnaie	etat	idclient
+				String req = String.join(" ","insert into COMPTES(noCompte,type,creele,solde,monnaie,etat,idclient) VALUES(",
+				"'"+thisaccount.getNumCompte()+"',","'"+thisaccount.getTypecompte()+"',","'"+thisaccount.getDateCreated()+"',","'"+thisaccount.getSolde()+"',","'"+thisaccount.getDevise()+"',","'"+thisaccount.getStatut()+"',",thisaccount.getIdclient()+");");
+//				System.out.println(req);
+				st.executeUpdate(req);
+				System.out.printf("---------------   Compte cree avec succes pour le client %s... ---------------------",lineClient);
+				
+			}catch(SQLException e){
+				System.out.println("Erreur le compte n'a pas ete cree...");
 				e.printStackTrace();
 			}
-		System.out.printf("---------------   Compte cree avec succes pour le client %s... ---------------------",lineClient.split("&&")[1]);
-//			System.out.println(thisaccount.toString());
 		}
 		
 	}
